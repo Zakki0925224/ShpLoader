@@ -135,7 +135,7 @@ namespace Assets
             Value = br.ReadChars(discriptor.FieldLength);
         }
     }
-    
+
     public class Range : IElement
     {
         public double Min { get; set; }
@@ -152,7 +152,7 @@ namespace Assets
             return sizeof(double) * 2;
         }
     }
-    
+
     public class RangeXY : IElement
     {
         public double MinX { get; set; }
@@ -160,7 +160,7 @@ namespace Assets
         public double MinY { get; set; }
         public double MaxY { get; set; }
 
-        public double Width  { get { return MaxX - MinX; } }
+        public double Width { get { return MaxX - MinX; } }
         public double Height { get { return MaxY - MinY; } }
 
         public void Load(ref BinaryReader br)
@@ -295,7 +295,7 @@ namespace Assets
         public int NumPoints { get; set; }
         public int[] Parts { get; set; }
         public Point[] Points { get; set; }
-        
+
         public void Load(ref BinaryReader br)
         {
             XYRange = new RangeXY();
@@ -330,22 +330,44 @@ namespace Assets
 
         public void Render(RangeXY range, Color color)
         {
-            GameObject shape = new GameObject("2DPolygon");
-            shape.AddComponent<MeshRenderer>();
-            shape.AddComponent<MeshFilter>();
-
-            // Change Point type
-            Vector2[] ptList = new Vector2[Points.Length];
-            for (int i = 0; i< Points.Length; i++)
+            GameObject parentShape = new GameObject("2DPolygon");
+            for (int i = 0; i < NumParts; i++)
             {
-                // For unity float acurracy,, 
-                double relativeX = (Points[i].X - (range.MaxX + range.MinX) / 2) % 100000;
-                double relativeY = (Points[i].Y - (range.MaxY + range.MinY) / 2) % 100000;
-                ptList[i] = new Vector2((float)relativeX, (float)relativeY);
+                int startIndex = Parts[i];
+                int endIndex;
+                if (i == NumParts - 1)
+                {
+                    endIndex = NumPoints;
+                }
+                else
+                {
+                    endIndex = Parts[i + 1];
+                }
+
+                if (startIndex >= endIndex)
+                {
+                    continue;
+                }
+
+                GameObject shape = new GameObject("2DPolygon");
+                shape.transform.parent = parentShape.transform;
+                shape.AddComponent<MeshRenderer>();
+                shape.AddComponent<MeshFilter>();
+
+                // Change Point type
+                Vector2[] ptList = new Vector2[endIndex - startIndex];
+                for (int j = startIndex; j < endIndex; j++)
+                {
+                    // For unity float acurracy,,
+                    double relativeX = (Points[j].X - (range.MaxX + range.MinX) / 2) % 100000;
+                    double relativeY = (Points[j].Y - (range.MaxY + range.MinY) / 2) % 100000;
+                    ptList[j - startIndex] = new Vector2((float)relativeX, (float)relativeY);
+                }
+
+                shape.GetComponent<MeshFilter>().mesh = Util.CreateMesh(ptList);
+                shape.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
+                shape.GetComponent<MeshRenderer>().sharedMaterial.SetColor("_Color", color);
             }
-            shape.GetComponent<MeshFilter>().mesh = Util.CreateMesh(ptList);
-            shape.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
-            shape.GetComponent<MeshRenderer>().sharedMaterial.SetColor("_Color", color);
         }
     }
 
@@ -379,7 +401,7 @@ namespace Assets
         public Point[] Points { get; set; }
         public Range MRange { get; set; }
         public double[] MValues { get; set; }
-        
+
         public void Load(ref BinaryReader br)
         {
             XYRange = new RangeXY();
@@ -484,7 +506,7 @@ namespace Assets
                 double relativeX = (Points[i].X - (range.MaxX + range.MinX) / 2) % 100000;
                 double relativeY = (Points[i].Y - (range.MaxY + range.MinY) / 2) % 100000;
                 Vector3 pt = new Vector3((float)relativeX, 0, (float)relativeY);
-                lineRenderer.SetPosition(i, pt*100);
+                lineRenderer.SetPosition(i, pt * 100);
             }
         }
     }
@@ -544,11 +566,11 @@ namespace Assets
 
             // Change Point type
             Vector2[] ptList = new Vector2[Points.Length];
-            for (int i = 0; i< Points.Length; i++)
+            for (int i = 0; i < Points.Length; i++)
             {
                 // For unity float acurracy,, 
                 double relativeX = (Points[i].X - (range.MaxX + range.MinX) / 2) % 100000; ;
-                double relativeY = (Points[i].Y - (range.MaxY + range.MinY) / 2) % 100000;;
+                double relativeY = (Points[i].Y - (range.MaxY + range.MinY) / 2) % 100000; ;
                 ptList[i] = new Vector2((float)relativeX, (float)relativeY);
             }
             shape.GetComponent<MeshFilter>().mesh = Util.CreateMesh(ptList);
@@ -804,7 +826,7 @@ namespace Assets
                 // For unity float acurracy,, 
                 double relativeX = (Points[i].X - (range.MaxX + range.MinX) / 2) % 100000;
                 double relativeY = (Points[i].Y - (range.MaxY + range.MinY) / 2) % 100000;
-                Vector2 pt = new Vector2((float)relativeX, (float)relativeY); 
+                Vector2 pt = new Vector2((float)relativeX, (float)relativeY);
                 ptList[i] = pt;
             }
 
@@ -888,7 +910,7 @@ namespace Assets
             size += Util.GetArraySize(MValues);
             return size;
         }
-        
+
         public void Render(RangeXY range, Color color)
         {
             throw new NotImplementedException();
