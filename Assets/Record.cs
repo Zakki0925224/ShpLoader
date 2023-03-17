@@ -48,17 +48,10 @@ namespace Assets
             return Header.GetLength() + Contents.GetLength();
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
-            try
-            {
-                IRenderableData renderContents = (IRenderableData)Contents;
-                renderContents.Render(range, color);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            IRenderableData renderContents = (IRenderableData)Contents;
+            return renderContents.Render(range, color);
         }
     }
 

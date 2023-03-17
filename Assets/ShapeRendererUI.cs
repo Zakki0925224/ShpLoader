@@ -7,7 +7,7 @@ namespace Assets
     public class ShapeRendererUI : EditorWindow
     {
         private static ShapeRendererUI window;
-        
+
         private Rect SelectBox;
         private Rect RenderBox;
 
@@ -35,7 +35,7 @@ namespace Assets
         {
             window = GetWindow<ShapeRendererUI>();
             window.maxSize = window.minSize = new Vector2(300, 400);
-            window.Show();;
+            window.Show(); ;
 
             shpFilePath = "";
             dbfFilePath = "";
@@ -48,7 +48,7 @@ namespace Assets
             // fixed window size
             GUILayout.ExpandHeight(false);
             GUILayout.ExpandWidth(false);
-            
+
             SelectBox = new Rect(3, 0, position.width - 6, EditorGUIUtility.singleLineHeight * 4);
             RenderBox = new Rect(3, EditorGUIUtility.singleLineHeight * 4, position.width - 6, EditorGUIUtility.singleLineHeight * 16);
 
@@ -115,14 +115,14 @@ namespace Assets
             EditorGUILayout.SelectableLabel(dbfFileVersion, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
             EditorGUILayout.IntField("Dbf Date", dbfFileDate, GUILayout.Height(EditorGUIUtility.singleLineHeight));
             EditorGUILayout.IntField("Record Count", dbfFileRecordCnt, GUILayout.Height(EditorGUIUtility.singleLineHeight));
-            
+
 
             // Check file loaded correctly  
             if (shapeFile == null)
                 GUI.enabled = false;
             else
                 GUI.enabled = true;
-            
+
 
             // Render Field
             GUILayout.Label("- Render Option : ", GUILayout.Height(EditorGUIUtility.singleLineHeight));
@@ -149,25 +149,25 @@ namespace Assets
             }
             catch (Exception e)
             {
-                if(path.Length == 0)
+                if (path.Length == 0)
                 {
                     Debug.Log("Path is empty.");
                     return null;
                 }
                 Debug.Log(e);
                 return null;
-            } 
+            }
         }
 
         private void RenderFiles(Color color)
         {
             try
             {
-                ((IRenderable)shapeFile).Render(color);
+                ((IRenderable)shapeFile).Render(color, dbfFile);
             }
             catch (Exception e)
             {
-                //Debug.Log(e);
+                Debug.Log(e);
             }
         }
     }
