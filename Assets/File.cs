@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Diagnostics;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -77,11 +78,24 @@ namespace Assets
             return record;
         }
 
-        public void Render(Color color)
+        public void Render(Color color, DbfFile dbfFile)
         {
-            foreach (ShpRecord record in RecordSet)
+            for (int i = 0; i < RecordSet.Count; i++)
             {
-                record.Render(TotalXYRange, color);
+                ShpRecord shpRecord = RecordSet[i];
+                GameObject gameObject = shpRecord.Render(TotalXYRange, color);
+                gameObject.AddComponent<ObjectRecord>();
+                ObjectRecord or = gameObject.GetComponent<ObjectRecord>();
+                or.Record = new Dictionary<string, string>();
+                or.RecordList = new List<string>();
+
+                for (int j = 0; j < dbfFile.FieldList.Count; j++)
+                {
+                    DbfFieldDiscriptor disc = dbfFile.FieldList[j];
+                    DbfRecord dbfRecord = dbfFile.RecordSet[i];
+                    or.Record.Add(disc.FieldName, dbfRecord.Record[j].ToString());
+                    or.RecordList.Add(dbfRecord.Record[j].ToString());
+                }
             }
         }
 
@@ -172,7 +186,7 @@ namespace Assets
 
         public IRecord GetData(int index)
         {
-            if(ContentsFile != null)
+            if (ContentsFile != null)
             {
                 ShxRecord shxRecord = (ShxRecord)RecordSet[index];
                 IRecord shpRecord = ContentsFile.GetData(ShpType, shxRecord.Offset, shxRecord.Length);
@@ -184,9 +198,9 @@ namespace Assets
             }
         }
 
-        public void Render(Color color)
+        public void Render(Color color, DbfFile dbfFile)
         {
-            ContentsFile.Render(color);
+            ContentsFile.Render(color, dbfFile);
         }
 
         public void Dispose()
@@ -208,7 +222,7 @@ namespace Assets
         }
     }
 
-    class DbfFile : IFile
+    public class DbfFile : IFile
     {
         private bool disposed;
         private FileStream fs;
@@ -231,9 +245,9 @@ namespace Assets
             fs = File.OpenRead(path);
             br = new BinaryReader(fs);
         }
-        
+
         public void Load()
-        {   
+        {
             Version = (DBFVersion)br.ReadByte();
             UpdateYear = br.ReadByte();
             UpdateMonth = br.ReadByte();
@@ -245,6 +259,7 @@ namespace Assets
 
             FieldList = new List<DbfFieldDiscriptor>();
             RecordSet = new List<DbfRecord>();
+
             while (br.PeekChar() != 0x0d)
             {
                 DbfFieldDiscriptor field = new DbfFieldDiscriptor();
@@ -254,7 +269,7 @@ namespace Assets
 
             br.BaseStream.Position = HeaderLength;
 
-            foreach(DbfFieldDiscriptor field in FieldList)
+            for (int i = 0; i < NumberOfRecords; i++)
             {
                 DbfRecord record = new DbfRecord(FieldList);
                 record.Load(ref br);
