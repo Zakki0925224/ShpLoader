@@ -18,15 +18,16 @@ namespace Assets
     {
         void Load(ref BinaryReader br);
         long GetLength();
+        string ToString();
     }
 
     public interface IRenderable
     {
-        void Render(Color color);
+        void Render(Color color, DbfFile dbfFile);
     }
 
     public interface IRenderableData
     {
-        void Render(RangeXY range, Color color);
+        GameObject Render(RangeXY range, Color color);
     }
 }

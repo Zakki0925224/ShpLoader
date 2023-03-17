@@ -24,8 +24,13 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            char[] rawData = br.ReadChars(discriptor.FieldLength);
-            Value = new string(rawData);
+            byte[] rawData = br.ReadBytes(discriptor.FieldLength);
+            Value = System.Text.Encoding.UTF8.GetString(rawData);
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
     }
 
@@ -46,8 +51,13 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            char[] rawData = br.ReadChars(discriptor.FieldLength);
+            byte[] rawData = br.ReadBytes(discriptor.FieldLength);
             Value = Convert.ToDateTime(rawData);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 
@@ -68,8 +78,13 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            char[] rawData = br.ReadChars(discriptor.FieldLength);
+            byte[] rawData = br.ReadBytes(discriptor.FieldLength);
             Value = Convert.ToSingle(rawData);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 
@@ -90,8 +105,13 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            char[] rawData = br.ReadChars(discriptor.FieldLength);
+            byte[] rawData = br.ReadBytes(discriptor.FieldLength);
             Value = Convert.ToBoolean(rawData);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 
@@ -112,7 +132,14 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            Value = br.ReadChars(discriptor.FieldLength);
+            byte[] rawData = br.ReadBytes(discriptor.FieldLength);
+            string str = System.Text.Encoding.UTF8.GetString(rawData);
+            Value = str.ToCharArray();
+        }
+
+        public override string ToString()
+        {
+            return new String(Value);
         }
     }
 
@@ -132,7 +159,14 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            Value = br.ReadChars(discriptor.FieldLength);
+            byte[] rawData = br.ReadBytes(discriptor.FieldLength);
+            string str = System.Text.Encoding.UTF8.GetString(rawData);
+            Value = str.ToCharArray();
+        }
+
+        public override string ToString()
+        {
+            return new String(Value);
         }
     }
 
@@ -267,7 +301,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             GameObject gameObject = new GameObject("2DPolyLine");
             LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -284,6 +318,8 @@ namespace Assets
                 Vector3 pt = new Vector3((float)relativeX, 0, (float)relativeY);
                 lineRenderer.SetPosition(i, pt);
             }
+
+            return gameObject;
         }
     }
 
@@ -328,7 +364,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             GameObject parentShape = new GameObject("2DPolygon");
             for (int i = 0; i < NumParts; i++)
@@ -365,9 +401,12 @@ namespace Assets
                 }
 
                 shape.GetComponent<MeshFilter>().mesh = Util.CreateMesh(ptList);
-                shape.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Standard"));
-                shape.GetComponent<MeshRenderer>().sharedMaterial.SetColor("_Color", color);
+                Material material = new Material(Shader.Find("Standard"));
+                material.SetColor("_Color", color);
+                shape.GetComponent<MeshRenderer>().sharedMaterial = material;
             }
+
+            return parentShape;
         }
     }
 
@@ -491,7 +530,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             GameObject gameObject = new GameObject("2DPolyLineM");
             LineRenderer lineRenderer = gameObject.AddComponent<LineRenderer>();
@@ -508,6 +547,8 @@ namespace Assets
                 Vector3 pt = new Vector3((float)relativeX, 0, (float)relativeY);
                 lineRenderer.SetPosition(i, pt * 100);
             }
+
+            return gameObject;
         }
     }
 
@@ -558,7 +599,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             GameObject shape = new GameObject("2DPolygonM");
             shape.AddComponent<MeshRenderer>();
@@ -576,6 +617,8 @@ namespace Assets
             shape.GetComponent<MeshFilter>().mesh = Util.CreateMesh(ptList);
             shape.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Default-Diffuse.mat"));
             shape.GetComponent<MeshRenderer>().sharedMaterial.SetColor("_Color", color);
+
+            return shape;
         }
     }
 
@@ -723,7 +766,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             GameObject shape = new GameObject("3DPolyLineZ");
             shape.AddComponent<MeshRenderer>();
@@ -743,6 +786,7 @@ namespace Assets
             shape.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Default-Diffuse.mat"));
             shape.GetComponent<MeshRenderer>().sharedMaterial.SetColor("_Color", color);
 
+            return shape;
         }
     }
 
@@ -813,7 +857,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             GameObject shape = new GameObject("3DPolygonZ");
             shape.AddComponent<MeshRenderer>();
@@ -833,6 +877,8 @@ namespace Assets
             shape.GetComponent<MeshFilter>().mesh = Util.CreateMesh(ptList);
             shape.GetComponent<MeshRenderer>().sharedMaterial = new Material(Shader.Find("Default-Diffuse.mat"));
             shape.GetComponent<MeshRenderer>().sharedMaterial.SetColor("_Color", color);
+
+            return shape;
         }
     }
 
@@ -911,7 +957,7 @@ namespace Assets
             return size;
         }
 
-        public void Render(RangeXY range, Color color)
+        public GameObject Render(RangeXY range, Color color)
         {
             throw new NotImplementedException();
         }
