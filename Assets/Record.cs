@@ -89,7 +89,7 @@ namespace Assets
 
         public void Load(ref BinaryReader br)
         {
-            FieldName = new string(br.ReadChars(11));
+            FieldName = new string(br.ReadChars(11)).Replace("\0", "");
             FieldType = (DBFFieldType)br.ReadChar();
             Address = br.ReadInt32();
             FieldLength = br.ReadByte();
