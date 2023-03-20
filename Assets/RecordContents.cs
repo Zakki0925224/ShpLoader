@@ -390,6 +390,10 @@ namespace Assets
                 shape.AddComponent<MeshRenderer>();
                 shape.AddComponent<MeshFilter>();
 
+                shape.AddComponent<Province>();
+                Province province = shape.GetComponent<Province>();
+                province.Id = $"{i}";
+
                 // Change Point type
                 Vector2[] ptList = new Vector2[endIndex - startIndex];
                 for (int j = startIndex; j < endIndex; j++)

@@ -85,17 +85,25 @@ namespace Assets
                 ShpRecord shpRecord = RecordSet[i];
                 GameObject gameObject = shpRecord.Render(TotalXYRange, color);
                 gameObject.AddComponent<ObjectRecord>();
-                ObjectRecord or = gameObject.GetComponent<ObjectRecord>();
-                or.Record = new Dictionary<string, string>();
-                or.RecordList = new List<string>();
+
+                Dictionary<string, string> record = new Dictionary<string, string>();
+                List<string> recordList = new List<string>();
 
                 for (int j = 0; j < dbfFile.FieldList.Count; j++)
                 {
                     DbfFieldDiscriptor disc = dbfFile.FieldList[j];
                     DbfRecord dbfRecord = dbfFile.RecordSet[i];
-                    or.Record.Add(disc.FieldName, dbfRecord.Record[j].ToString());
-                    or.RecordList.Add(dbfRecord.Record[j].ToString());
+                    record.Add(disc.FieldName, dbfRecord.Record[j].ToString());
+                    recordList.Add(dbfRecord.Record[j].ToString());
                 }
+
+                gameObject.AddComponent<Province>();
+                Province province = gameObject.GetComponent<Province>();
+                province.Id = record["iso_3166_2"];
+
+                ObjectRecord or = gameObject.GetComponent<ObjectRecord>();
+                or.Record = record;
+                or.RecordList = recordList;
             }
         }
 
